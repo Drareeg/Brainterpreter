@@ -1,0 +1,63 @@
+class State:
+    def __init__(self):
+        super().__init__()
+        self.data_pointer = 0
+        self.data = {0: 0}
+
+    def handle(self, char):
+        if char == '>':
+            self.data_pointer += 1
+            if not self.data_pointer in self.data:
+                self.data[self.data_pointer] = 0
+        elif char == '<':
+            self.data_pointer -= 1
+            if not self.data_pointer in self.data:
+                self.data[self.data_pointer] = 0
+        elif char == '+':
+            self.data[self.data_pointer] += 1
+        elif char == '-':
+            self.data[self.data_pointer] -= 1
+        elif char == '.':
+            print(chr(self.data[self.data_pointer]), end="")
+        elif char == ',':
+            self.data[self.data_pointer] = ord(input()[0])
+            # print(self.data)
+
+
+    def currentTrue(self):
+        return not self.data[self.data_pointer] == 0
+
+
+if __name__ == "__main__":
+    s = State()
+    skipLevel = 0
+    stack = list()
+    program = ""
+    for char in """
+    ++++++++++[>+++++++>++++++++++>+++>+<<<<-]
+    >++.>+.+++++++..+++.>++.<<+++++++++++++++.
+    >.+++.------.--------.>+.>.
+
+    """:
+        program += char
+    position = 0
+    while position < len(program):
+        command = program[position]
+        position += 1
+        if skipLevel > 0:
+            if command == '[':
+                skipLevel += 1
+            if command == ']':
+                skipLevel -= 1
+        else:
+            if command == '[':
+                if s.currentTrue():
+                    stack.append(position)
+                else:
+                    skipLevel += 1
+            if command == ']':
+                if s.currentTrue():
+                    position = stack[-1]  #peek
+                else:
+                    stack.pop()
+            s.handle(command)
